@@ -1,0 +1,27 @@
+{
+    "python.defaultInterpreterPath": "C:\\Anaconda\\envs\\myenv\\python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.condaPath": "C:\\Anaconda\\Scripts\\conda.exe",
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "args": [
+                "-NoExit",
+                "-Command",
+                "conda activate myenv"
+            ]
+        },
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\Sysnative\\cmd.exe",
+                "${env:windir}\\System32\\cmd.exe"
+            ],
+            "args": [
+                "/K",
+                "conda activate myenv"
+            ],
+            "icon": "terminal-cmd"
+        }
+    }
+}
