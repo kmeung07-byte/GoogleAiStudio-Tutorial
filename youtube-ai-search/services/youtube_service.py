@@ -17,27 +17,43 @@ def extract_video_id(url: str) -> Optional[str]:
         return match.group(1)
     return None
 
+def format_duration_seconds(seconds: Any) -> str:
+    """초 단위 시간을 MM:SS 또는 HH:MM:SS 문자열로 변환합니다."""
+    if isinstance(seconds, str) and ":" in seconds:
+        return seconds
+    try:
+        sec = int(round(float(seconds)))
+    except (ValueError, TypeError):
+        sec = 0
+
+    h = sec // 3600
+    m = (sec % 3600) // 60
+    s = sec % 60
+    if h > 0:
+        return f"{h:02d}:{m:02d}:{s:02d}"
+    return f"{m:02d}:{s:02d}"
+
 def get_video_info(url: str) -> Dict[str, Any]:
-    """유튜브 영상 메타데이터를 빠르게 조회합니다."""
+    """유튜브 영상 메타데이터를 조회합니다."""
     video_id = extract_video_id(url)
     if not video_id:
         raise ValueError("올바른 유튜브 링크 주소가 아닙니다.")
 
     ydl_opts = {
         'skip_download': True,
-        'extract_flat': True,
         'noplaylist': True,
         'quiet': True,
         'no_warnings': True,
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
+        duration_sec = info.get('duration') or 0
         return {
             'id': video_id,
             'title': info.get('title', 'YouTube Video'),
             'uploader': info.get('uploader') or info.get('channel', 'Channel'),
-            'duration': info.get('duration', 0),
-            'thumbnail': info.get('thumbnail') or f"https://i.ytimg.com/vi/{video_id}/maxresdefault.jpg",
+            'duration_sec': duration_sec,
+            'duration': format_duration_seconds(duration_sec),
             'webpage_url': info.get('webpage_url', f"https://www.youtube.com/watch?v={video_id}"),
         }
 
@@ -79,13 +95,14 @@ def download_audio(url: str) -> Dict[str, Any]:
         }
         mime_type = mime_types.get(ext, 'audio/mp4')
         file_size = os.path.getsize(filename) if os.path.exists(filename) else 0
+        duration_sec = info.get('duration') or 0
 
         return {
             'id': video_id,
             'title': info.get('title', 'YouTube Video'),
             'uploader': info.get('uploader') or info.get('channel', 'Channel'),
-            'duration': info.get('duration', 0),
-            'thumbnail': info.get('thumbnail') or f"https://i.ytimg.com/vi/{video_id}/maxresdefault.jpg",
+            'duration_sec': duration_sec,
+            'duration': format_duration_seconds(duration_sec),
             'file_path': filename,
             'file_name': os.path.basename(filename),
             'ext': ext,

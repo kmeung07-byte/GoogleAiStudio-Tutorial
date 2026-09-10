@@ -9,13 +9,13 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 CSV_PATH = os.path.join(DATA_DIR, "transcripts.csv")
 
+# thumbnail 컬럼 제거됨
 CSV_FIELDS = [
     "video_id",
     "url",
     "title",
     "uploader",
     "duration",
-    "thumbnail",
     "full_text",
     "segments",
     "srt_text",
@@ -23,6 +23,53 @@ CSV_FIELDS = [
     "model_used",
     "created_at",
 ]
+
+def format_duration(seconds: Any, segments: List[Dict[str, Any]] = None) -> str:
+    """초 단위 시간 또는 세그먼트를 기반으로 MM:SS / HH:MM:SS 형식의 정확한 재생 시간 문자열을 생성합니다."""
+    sec = 0.0
+    if isinstance(seconds, str):
+        if ":" in seconds:
+            return seconds
+        try:
+            sec = float(seconds)
+        except ValueError:
+            sec = 0.0
+    elif isinstance(seconds, (int, float)):
+        sec = float(seconds)
+
+    # duration 정보가 0이거나 누락된 경우 세그먼트의 최대 end_sec로 계산
+    if sec <= 0.0 and segments:
+        for s in segments:
+            try:
+                end_s = float(s.get("end_sec", 0.0))
+                if end_s > sec:
+                    sec = end_s
+            except Exception:
+                pass
+
+    total_sec = int(round(sec))
+    h = total_sec // 3600
+    m = (total_sec % 3600) // 60
+    s = total_sec % 60
+    if h > 0:
+        return f"{h:02d}:{m:02d}:{s:02d}"
+    return f"{m:02d}:{s:02d}"
+
+def parse_duration_to_seconds(dur_str: str) -> int:
+    """MM:SS 또는 HH:MM:SS 문자열을 총 초(second) 단위 정수로 변환합니다."""
+    if not dur_str:
+        return 0
+    if ":" not in dur_str:
+        try:
+            return int(float(dur_str))
+        except ValueError:
+            return 0
+    parts = dur_str.split(":")
+    if len(parts) == 3:
+        return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+    elif len(parts) == 2:
+        return int(parts[0]) * 60 + int(parts[1])
+    return 0
 
 def init_csv_if_needed():
     """CSV 파일이 없으면 헤더와 함께 초기화합니다."""
@@ -49,13 +96,17 @@ def find_transcript_in_csv(video_id: str) -> Optional[Dict[str, Any]]:
                     except Exception:
                         segments = []
 
+                    dur_raw = row.get("duration", "00:00")
+                    formatted_dur = format_duration(dur_raw, segments)
+                    dur_seconds = parse_duration_to_seconds(formatted_dur)
+
                     return {
                         "video": {
                             "id": row.get("video_id"),
                             "title": row.get("title"),
                             "uploader": row.get("uploader"),
-                            "duration": int(row.get("duration", 0)) if str(row.get("duration", "0")).isdigit() else 0,
-                            "thumbnail": row.get("thumbnail"),
+                            "duration": formatted_dur,
+                            "duration_sec": dur_seconds,
                             "webpage_url": row.get("url"),
                         },
                         "transcription": {
@@ -94,19 +145,24 @@ def save_transcript_to_csv(
                 for idx, row in enumerate(reader):
                     if row.get("video_id") == video_id:
                         found_index = idx
-                    existing_rows.append(row)
+                    # CSV_FIELDS에 포함된 키만 복사 (thumbnail 등 제거)
+                    filtered_row = {k: row.get(k, "") for k in CSV_FIELDS}
+                    existing_rows.append(filtered_row)
         except Exception:
             existing_rows = []
+
+    segments = transcription.get("segments", [])
+    raw_dur = video_info.get("duration") or video_info.get("duration_sec") or 0
+    duration_str = format_duration(raw_dur, segments)
 
     new_row = {
         "video_id": video_id,
         "url": url,
         "title": video_info.get("title", ""),
         "uploader": video_info.get("uploader", ""),
-        "duration": str(video_info.get("duration", 0)),
-        "thumbnail": video_info.get("thumbnail", ""),
+        "duration": duration_str,
         "full_text": transcription.get("full_text", ""),
-        "segments": json.dumps(transcription.get("segments", []), ensure_ascii=False),
+        "segments": json.dumps(segments, ensure_ascii=False),
         "srt_text": transcription.get("srt_text", ""),
         "word_count": str(transcription.get("word_count", len(transcription.get("full_text", "").split()))),
         "model_used": transcription.get("model_used", "gemini-3.5-transcribe"),
