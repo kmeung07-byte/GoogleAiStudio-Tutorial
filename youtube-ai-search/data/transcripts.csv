@@ -1,0 +1,21 @@
+﻿video_id,url,title,uploader,duration,thumbnail,full_text,segments,srt_text,word_count,model_used,created_at
+jNQXAC9IVRw,https://www.youtube.com/watch?v=jNQXAC9IVRw,Me at the zoo,jawed,19,https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AG-AoAC8AGKAgwIABABGFUgWShlMA8=&rs=AOn4CLA9eLBatYv9WbkD4BbZ2Im-biSPTw,"All right, so here we are in front of the elephants. Cool thing about these guys is that they have really really really long trunks. And that's that's cool. And that's pretty much all there is to say.","[{""index"": 1, ""start_sec"": 1.4, ""end_sec"": 3.5, ""display_time"": ""00:01"", ""speaker"": ""spk:0"", ""text"": ""All right, so here we are in front of the elephants.""}, {""index"": 2, ""start_sec"": 5.2, ""end_sec"": 10.1, ""display_time"": ""00:05"", ""speaker"": ""spk:0"", ""text"": ""Cool thing about these guys is that they have really really really""}, {""index"": 3, ""start_sec"": 10.2, ""end_sec"": 12.4, ""display_time"": ""00:10"", ""speaker"": ""spk:0"", ""text"": ""long trunks.""}, {""index"": 4, ""start_sec"": 12.9, ""end_sec"": 13.8, ""display_time"": ""00:12"", ""speaker"": ""spk:0"", ""text"": ""And that's that's cool.""}, {""index"": 5, ""start_sec"": 17.0, ""end_sec"": 18.5, ""display_time"": ""00:17"", ""speaker"": ""spk:0"", ""text"": ""And that's pretty much all there is to say.""}]","1
+00:00:01,400 --> 00:00:03,500
+All right, so here we are in front of the elephants.
+
+2
+00:00:05,200 --> 00:00:10,100
+Cool thing about these guys is that they have really really really
+
+3
+00:00:10,200 --> 00:00:12,400
+long trunks.
+
+4
+00:00:12,900 --> 00:00:13,800
+And that's that's cool.
+
+5
+00:00:17,000 --> 00:00:18,500
+And that's pretty much all there is to say.
+",38,gemini-3.5-transcribe,2026-09-10 15:31:25

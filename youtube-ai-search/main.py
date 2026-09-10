@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 from typing import Dict, Any, Optional, List
 from fastapi import FastAPI, HTTPException, Request
@@ -12,6 +12,7 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
 from services.youtube_service import extract_video_id, get_video_info, download_audio, DOWNLOAD_DIR
 from services.stt_service import transcribe_audio_gemini
 from services.ai_search_service import find_timestamp_for_content, answer_question_with_gemini
+from services.csv_storage_service import find_transcript_in_csv, save_transcript_to_csv
 
 app = FastAPI(
     title="AI YouTube Search Studio",
@@ -48,30 +49,48 @@ async def init_video(req: VideoInitRequest):
     if not video_id:
         raise HTTPException(status_code=400, detail="올바른 유튜브 영상 URL을 입력해주세요.")
 
-    # 1. 이미 전사 캐시가 존재하는 경우 즉시 반환
+    # 1. 인메모리 캐시 확인
     if video_id in VIDEO_CACHE and VIDEO_CACHE[video_id].get("transcription", {}).get("success"):
         cached = VIDEO_CACHE[video_id]
         return {
             "success": True,
             "cached": True,
+            "source": "memory",
             "video_id": video_id,
             "video": cached["video"],
             "transcription": cached["transcription"],
         }
 
-    # 2. 메타데이터 조회
+    # 2. CSV 파일 영구 저장소에서 기존 전사 데이터 확인
+    csv_data = find_transcript_in_csv(video_id)
+    if csv_data and csv_data.get("transcription", {}).get("success"):
+        # 메모리 캐시에도 적재
+        VIDEO_CACHE[video_id] = {
+            "video": csv_data["video"],
+            "transcription": csv_data["transcription"]
+        }
+        return {
+            "success": True,
+            "cached": True,
+            "source": "csv",
+            "video_id": video_id,
+            "video": csv_data["video"],
+            "transcription": csv_data["transcription"],
+        }
+
+    # 3. CSV에 없으면 메타데이터 조회
     try:
         video_info = get_video_info(url)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"영상 정보를 조회하지 못했습니다: {str(e)}")
 
-    # 3. 오디오 다운로드
+    # 4. 오디오 다운로드
     try:
         audio_info = download_audio(url)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"오디오 스트림 다운로드 실패: {str(e)}")
 
-    # 4. Gemini 3.5 Transcribe STT 실행
+    # 5. Gemini 3.5 Transcribe STT 실행
     try:
         transcription = transcribe_audio_gemini(
             file_path=audio_info["file_path"],
@@ -83,7 +102,18 @@ async def init_video(req: VideoInitRequest):
     if not transcription.get("success"):
         raise HTTPException(status_code=500, detail=f"전사 처리 중 오류: {transcription.get('error')}")
 
-    # 캐시에 저장
+    # 6. CSV 영구 저장소에 저장
+    try:
+        save_transcript_to_csv(
+            video_id=video_id,
+            url=url,
+            video_info=video_info,
+            transcription=transcription
+        )
+    except Exception as e:
+        print(f"[Warning] Failed to save transcript to CSV: {e}")
+
+    # 7. 메모리 캐시에 저장
     result_payload = {
         "video": video_info,
         "audio": {
@@ -98,6 +128,7 @@ async def init_video(req: VideoInitRequest):
     return {
         "success": True,
         "cached": False,
+        "source": "gemini",
         "video_id": video_id,
         "video": video_info,
         "transcription": transcription,
@@ -151,6 +182,18 @@ async def ask_question(req: QARequest):
         "question": question,
         "answer": qa_result.get("answer", "")
     }
+
+@app.get("/api/export-csv")
+async def export_csv():
+    from services.csv_storage_service import CSV_PATH, init_csv_if_needed
+    init_csv_if_needed()
+    if not os.path.exists(CSV_PATH):
+        raise HTTPException(status_code=404, detail="저장된 CSV 파일이 없습니다.")
+    return FileResponse(
+        path=CSV_PATH,
+        media_type="text/csv",
+        filename="youtube_transcripts.csv"
+    )
 
 @app.get("/api/audio/{filename}")
 async def serve_audio(filename: str):
