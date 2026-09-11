@@ -1,0 +1,168 @@
+    /* 유튜브 스타일 스크롤바 */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
+    
+    .yt-pill-input {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+    }
+    .yt-pill-input:focus-within {
+      border-color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+    }
+
+    /* 테마별 배경 스타일 (하얀색 / 검은색) */
+    body.theme-dark {
+      background-color: #0f0f0f;
+      color: #f1f5f9;
+    }
+    body.theme-light {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* 하얀색 배경 (라이트 모드) 전환 시 로고 및 컴포넌트 색상 반전/최적화 */
+    body.theme-light header {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    body.theme-light #btn-hamburger {
+      color: #334155;
+    }
+    body.theme-light #btn-hamburger:hover {
+      color: #0f172a;
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    /* 유튜브 로고 글자: 검은색으로 선명하게 전환 */
+    body.theme-light #yt-logo-text {
+      color: #0f0f0f !important;
+    }
+    body.theme-light #theme-switch-label {
+      color: #334155 !important;
+    }
+    body.theme-light #url-search-box {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+    }
+    body.theme-light #input-youtube-url {
+      color: #0f172a !important;
+    }
+    body.theme-light #input-youtube-url::placeholder {
+      color: #94a3b8 !important;
+    }
+    body.theme-light #btn-paste-url {
+      color: #64748b !important;
+    }
+    body.theme-light #btn-paste-url:hover {
+      color: #0f172a !important;
+    }
+    body.theme-light #btn-search-url {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #334155 !important;
+    }
+    body.theme-light #btn-search-url:hover {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light #ai-model-badge {
+      background-color: #f5f3ff !important;
+      border-color: #ddd6fe !important;
+      color: #6d28d9 !important;
+    }
+
+    /* 카드 및 서브 컴포넌트 라이트 모드 */
+    body.theme-light .theme-card {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+    body.theme-light .sample-chip {
+      background-color: #e2e8f0 !important;
+      color: #334155 !important;
+    }
+    body.theme-light .sample-chip:hover {
+      background-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light #content-search-container {
+      background: linear-gradient(to top, #ffffff, rgba(248, 250, 252, 0.95), rgba(248, 250, 252, 0.6)) !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.theme-light .yt-pill-input {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    }
+    body.theme-light .yt-pill-input input {
+      color: #0f172a !important;
+    }
+    body.theme-light .yt-pill-input input::placeholder {
+      color: #64748b !important;
+    }
+    body.theme-light #btn-content-search {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+    }
+    body.theme-light #btn-content-search:hover {
+      background-color: #1e293b !important;
+    }
+    body.theme-light #video-controls-bar {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.theme-light #btn-toggle-play {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light #btn-toggle-play:hover {
+      background-color: #cbd5e1 !important;
+    }
+    body.theme-light #video-title-display {
+      color: #0f172a !important;
+    }
+    body.theme-light #volume-container {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.theme-light #volume-percent {
+      color: #334155 !important;
+    }
+    body.theme-light #tab-header {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.theme-light .tab-btn-inactive {
+      background-color: #e2e8f0 !important;
+      color: #475569 !important;
+    }
+    body.theme-light .tab-btn-inactive:hover {
+      background-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light .qa-chip {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+      color: #334155 !important;
+    }
+    body.theme-light .qa-chip:hover {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light #qa-history {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.theme-light #input-qa-question {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light #input-qa-question::placeholder {
+      color: #94a3b8 !important;
+    }
